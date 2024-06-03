@@ -1,6 +1,5 @@
 package com.example.demo.moduls;
 
-import com.example.demo.moduls.enums.Product;
 import com.example.demo.moduls.enums.Role;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -20,6 +19,7 @@ public class User implements UserDetails {
     private Long id;
     @Column(name = "email", unique = true)
     private String email;
+    private String activationCode;
     @Column(name = "phone_number")
     private String phoneNumber;
     @Column(name = "name")
@@ -44,8 +44,6 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
-    private List<Product> products = new ArrayList<>();
     private LocalDateTime dateOfCreated;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

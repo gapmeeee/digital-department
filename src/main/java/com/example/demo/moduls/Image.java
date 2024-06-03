@@ -1,7 +1,6 @@
 package com.example.demo.moduls;
 
 
-import com.example.demo.moduls.enums.Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +29,4 @@ public class Image {
     @Lob
     @Column(name="bytes", columnDefinition = "longblob")
     private byte[]  bytes;
-
-    @ManyToOne(cascade =  CascadeType.REFRESH, fetch = FetchType.EAGER)
-    private Product product;
 }

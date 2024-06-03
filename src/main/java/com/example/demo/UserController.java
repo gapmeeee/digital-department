@@ -38,7 +38,6 @@ public class UserController {
     public String userInfo(@PathVariable("user") User user, Model model, Principal principal){
         if (userService.getUserByPrincipal(principal).getEmail()==user.getEmail() ){
             model.addAttribute("user", user);
-            model.addAttribute("products", user.getProducts());
             return "user-info";
         }
         return "redirect:/";
@@ -47,5 +46,16 @@ public class UserController {
     @GetMapping("/hello")
     public String SecurityUrl(){
         return "hello";
+    }
+    @GetMapping("/activate/{code}")
+    public String activate(Model model, @PathVariable String code){
+        boolean isActivate = userService.activateUser(code);
+        if(isActivate){
+            model.addAttribute("message", "Активация прошла успешно");
+        }
+        else {
+            model.addAttribute("message", "Активация прошла не успешно");
+        }
+        return "login";
     }
 }

@@ -10,10 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,14 +19,23 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder paswordEncoder;
+    private final MailService mailSender;
     public boolean createUser(User user){
         String email = user.getEmail();
         if (userRepository.findByEmail(email)!= null) return false;
         user.setActive(true);
         user.setPassword(paswordEncoder.encode(user.getPassword()));
         user.getRoles().add(Role.ROLE_ADMIN);
+        user.setActivationCode(UUID.randomUUID().toString());
         log.info("Saving new User with Email: {}", email);
         userRepository.save(user);
+        String message = String.format(
+                "Hello, %s! \n" +
+                        "Welcome to Digital Departments. Please, visit next link: http://localhost:8080/activate/%s",
+                        user.getUsername(),
+                        user.getActivationCode()
+        );
+        mailSender.send(user.getEmail(), "Activation code", message);
         return true;
     }
     public List<User> list(){
@@ -76,4 +82,13 @@ public class UserService {
         return userRepository.findByEmail(principal.getName());
     }
 
+    public boolean activateUser(String code) {
+        User user = userRepository.findByActivationCode(code);
+        if(user==null){
+            return false;
+        }
+        user.setActivationCode(null);
+        userRepository.save(user);
+        return true;
+    }
 }
